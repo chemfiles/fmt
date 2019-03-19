@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 2.8.12)
 
 # Use newer policies if available, up to most recent tested version of CMake.
 if(${CMAKE_VERSION} VERSION_LESS 3.11)
@@ -156,8 +156,10 @@ add_headers(FMT_HEADERS chrono.h color.h compile.h core.h format.h format-inl.h
                         locale.h os.h ostream.h posix.h printf.h ranges.h)
 set(FMT_SOURCES src/format.cc src/os.cc)
 
-add_library(fmt ${FMT_SOURCES} ${FMT_HEADERS} README.rst ChangeLog.rst)
-add_library(fmt::fmt ALIAS fmt)
+# add_library(fmt ${FMT_SOURCES} ${FMT_HEADERS} include/format README.rst
+#             ChangeLog.rst)
+# add_library(fmt::fmt ALIAS fmt)
+add_library(fmt OBJECT ${FMT_SOURCES} ${FMT_HEADERS})
 
 if (HAVE_STRTOD_L)
   target_compile_definitions(fmt PUBLIC FMT_LOCALE)
@@ -184,7 +186,7 @@ if (BUILD_SHARED_LIBS)
   if (UNIX AND NOT APPLE AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
     # Fix rpmlint warning:
     # unused-direct-shlib-dependency /usr/lib/libformat.so.1.1.0 /lib/libm.so.6.
-    target_link_libraries(fmt -Wl,--as-needed)
+    # target_link_libraries(fmt -Wl,--as-needed)
   endif ()
   target_compile_definitions(fmt PRIVATE FMT_EXPORT INTERFACE FMT_SHARED)
 endif ()
@@ -192,16 +194,16 @@ if (FMT_SAFE_DURATION_CAST)
   target_compile_definitions(fmt PUBLIC FMT_SAFE_DURATION_CAST)
 endif()
 
-add_library(fmt-header-only INTERFACE)
-add_library(fmt::fmt-header-only ALIAS fmt-header-only)
-
-target_compile_definitions(fmt-header-only INTERFACE FMT_HEADER_ONLY=1)
-
-target_compile_features(fmt-header-only INTERFACE ${FMT_REQUIRED_FEATURES})
-
-target_include_directories(fmt-header-only INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+# add_library(fmt-header-only INTERFACE)
+# add_library(fmt::fmt-header-only ALIAS fmt-header-only)
+#
+# target_compile_definitions(fmt-header-only INTERFACE FMT_HEADER_ONLY=1)
+#
+# target_compile_features(fmt-header-only INTERFACE ${FMT_REQUIRED_FEATURES})
+#
+# target_include_directories(fmt-header-only INTERFACE
+#   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+#   $<INSTALL_INTERFACE:include>)
 
 # Install targets.
 if (FMT_INSTALL)
